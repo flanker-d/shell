@@ -177,20 +177,20 @@ int main(int argc, char *argv[])
 {
   std::string cmd;//("who | sort | uniq -c | sort -nk1");
   //while(true)
-  {
+//  {
     std::getline(std::cin, cmd);
-    if(!fork())
-    {
+//    if(!fork())
+//    {
       process_command(cmd);
-    }
-    else
-    {
-      struct sigaction sigact;
-      struct sigaction osigact;
-      sigact.sa_handler = sig_child_handler;
+//    }
+//    else
+//    {
+//      struct sigaction sigact;
+//      struct sigaction osigact;
+//      sigact.sa_handler = sig_child_handler;
 
-      sigaction(SIGCHLD, &sigact, &osigact);
-    }
-  }
+//      sigaction(SIGCHLD, &sigact, &osigact);
+//    }
+//  }
   return 0;
 }

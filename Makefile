@@ -1,3 +1,3 @@
 all:
-	g++ main.cpp -o shell
+	g++ /home/box/main.cpp -o /home/box/shell
 
