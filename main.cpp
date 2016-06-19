@@ -2,7 +2,7 @@
 #include <string.h>
 //#include <regex>
 #include <algorithm>
-#include <tuple>
+//#include <tuple>
 #include <vector>
 #include <unistd.h>
 #include <stdio.h>
@@ -11,7 +11,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-using vect_of_tup = std::vector<std::tuple<std::string, std::string>>;
+//using vect_of_tup = std::vector<std::tuple<std::string, std::string>>;
+using vect_of_tup = std::vector<std::pair<std::string, std::string>>;
 
 void sig_child_handler(int sig)
 {
@@ -40,8 +41,10 @@ void sig_child_handler(int sig)
 //  return cmd_queue;
 //}
 
-void remove_chars_from_string(std::string &str, char* charsToRemove ) {
-   for ( unsigned int i = 0; i < strlen(charsToRemove); ++i ) {
+void remove_chars_from_string(std::string &str, char* charsToRemove )
+{
+   for ( unsigned int i = 0; i < strlen(charsToRemove); ++i )
+   {
       str.erase( remove(str.begin(), str.end(), charsToRemove[i]), str.end() );
    }
 }
@@ -87,7 +90,8 @@ vect_of_tup get_command_queue_without_regexp(std::string &cmd)
     remove_chars_from_string(command, " ");
     remove_chars_from_string(params, " ");
 
-    auto tup = std::make_tuple(command, params);
+    //auto tup = std::make_tuple(command, params);
+    auto tup = std::make_pair(command, params);
     cmd_queue.push_back(tup);
   }
 
@@ -172,7 +176,7 @@ void process_command(std::string &cmd)
 int main(int argc, char *argv[])
 {
   std::string cmd;//("who | sort | uniq -c | sort -nk1");
-  while(true)
+  //while(true)
   {
     std::getline(std::cin, cmd);
     if(!fork())
