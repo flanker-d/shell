@@ -12,7 +12,7 @@
 #include <sys/wait.h>
 
 //using vect_of_tup = std::vector<std::tuple<std::string, std::string>>;
-using vect_of_tup = std::vector<std::pair<std::string, std::string>>;
+//using vect_of_tup = std::vector<std::pair<std::string, std::string>>;
 
 void sig_child_handler(int sig)
 {
@@ -21,13 +21,13 @@ void sig_child_handler(int sig)
   //printf("signal %d received\n", sig);
 }
 
-//vect_of_tup get_command_queue(std::string &cmd)
+//std::vector<std::pair<std::string, std::string>> get_command_queue(std::string &cmd)
 //{
 //  std::regex regexp("(\\w+)\\s?(-\\w+)?");
 //  auto it_begin = std::sregex_iterator(cmd.cbegin(), cmd.cend(), regexp);
 //  auto it_end = std::sregex_iterator();
 
-//  vect_of_tup cmd_queue;
+//  std::vector<std::pair<std::string, std::string>> cmd_queue;
 //  for (auto it = it_begin; it != it_end; it++)
 //  {
 //    std::smatch match = *it;
@@ -49,9 +49,9 @@ void remove_chars_from_string(std::string &str, char* charsToRemove )
    }
 }
 
-vect_of_tup get_command_queue_without_regexp(std::string &cmd)
+std::vector<std::pair<std::string, std::string>> get_command_queue_without_regexp(std::string &cmd)
 {
-  vect_of_tup cmd_queue;
+  std::vector<std::pair<std::string, std::string>> cmd_queue;
   std::vector<std::string> cmd_vect;
   int start_pos = 0;
   int i = 0;
@@ -98,7 +98,7 @@ vect_of_tup get_command_queue_without_regexp(std::string &cmd)
   return cmd_queue;
 }
 
-bool is_first_command(vect_of_tup::reverse_iterator &iter_begin, vect_of_tup::reverse_iterator &iter_cur)
+bool is_first_command(std::vector<std::pair<std::string, std::string>>::reverse_iterator &iter_begin, std::vector<std::pair<std::string, std::string>>::reverse_iterator &iter_cur)
 {
   if(iter_begin == iter_cur)
     return true;
@@ -106,7 +106,7 @@ bool is_first_command(vect_of_tup::reverse_iterator &iter_begin, vect_of_tup::re
     return false;
 }
 
-void run_processes(vect_of_tup::reverse_iterator &iter_begin, vect_of_tup::reverse_iterator &iter_cur, vect_of_tup::reverse_iterator &iter_end)
+void run_processes(std::vector<std::pair<std::string, std::string>>::reverse_iterator &iter_begin, std::vector<std::pair<std::string, std::string>>::reverse_iterator &iter_cur, std::vector<std::pair<std::string, std::string>>::reverse_iterator &iter_end)
 {
   if(iter_cur == iter_end)
     return;
@@ -164,11 +164,11 @@ void run_processes(vect_of_tup::reverse_iterator &iter_begin, vect_of_tup::rever
 
 void process_command(std::string &cmd)
 {
-  vect_of_tup cmd_queue = get_command_queue_without_regexp(cmd);
+  std::vector<std::pair<std::string, std::string>> cmd_queue = get_command_queue_without_regexp(cmd);
 
-  vect_of_tup::reverse_iterator iter_begin =  cmd_queue.rbegin();
-  vect_of_tup::reverse_iterator iter_end = cmd_queue.rend();
-  vect_of_tup::reverse_iterator iter_cur = iter_begin;
+  std::vector<std::pair<std::string, std::string>>::reverse_iterator iter_begin =  cmd_queue.rbegin();
+  std::vector<std::pair<std::string, std::string>>::reverse_iterator iter_end = cmd_queue.rend();
+  std::vector<std::pair<std::string, std::string>>::reverse_iterator iter_cur = iter_begin;
 
   run_processes(iter_begin, iter_cur, iter_end);
 }
