@@ -110,8 +110,8 @@ void run_processes(std::vector<std::pair<std::string, std::string> >::reverse_it
 {
   if(iter_cur == iter_end)
     return;
-  std::string command = std::get<0>(*iter_cur);
-  std::string params = std::get<1>(*iter_cur);
+  std::string command = (*iter_cur).first;
+  std::string params = (*iter_cur).second;
 
   int pfd[2];
   pipe(pfd);
