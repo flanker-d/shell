@@ -1,3 +1,3 @@
 all:
-	clang++ /home/box/main.cpp -o /home/box/shell -lboost_regex
+	g++ /home/box/main.cpp -o /home/box/shell
 

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string.h>
-//#include <boost/regex.hpp>
-#include <regex>
+#include <strstream>
 #include <algorithm>
 #include <vector>
 #include <unistd.h>
@@ -19,34 +18,47 @@ void sig_child_handler(int sig)
 
 std::vector<std::pair<std::string, std::vector<std::string> > > get_command_queue(std::string &cmd)
 {
-  std::regex regexp("([\\w\\s.-]+)");
-  std::sregex_iterator it_begin = std::sregex_iterator(cmd.begin(), cmd.end(), regexp);
-  std::sregex_iterator it_end = std::sregex_iterator();
+  std::vector<std::string> tokens;
+  std::stringstream ss;
+  ss << cmd;
+  std::copy(std::istream_iterator<std::string>(ss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
+
+  std::vector<std::vector<std::string>> cmdlist;
+  std::vector<std::string>::iterator first = tokens.begin();
+  std::vector<std::string>::iterator last = tokens.end();
+  for (std::vector<std::string>::iterator it = first; it != last; ++it)
+  {
+    if (*it == "|")
+    {
+      cmdlist.emplace_back(first, it);
+      first = it + 1;
+    }
+  }
+  if (first != last)
+  {
+    cmdlist.emplace_back(first, last);
+  }
 
   std::vector<std::pair<std::string, std::vector<std::string> > > cmd_queue;
-  for (std::sregex_iterator it = it_begin; it != it_end; it++)
+  for(std::vector<std::vector<std::string> >::iterator it = cmdlist.begin(); it != cmdlist.end(); it++)
   {
-    std::smatch match = *it;
-    std::string lexem = match[1];
-    std::regex regexp_lex("([\\w.-]+)");
-    std::sregex_iterator it_lex_begin = std::sregex_iterator(lexem.begin(), lexem.end(), regexp_lex);
-    std::sregex_iterator it_lex_end = std::sregex_iterator();
-    int i = 0;
+    std::vector<std::string> vect = *it;
     std::string command;
-    std::vector<std::string> params_vect;
-    for(std::sregex_iterator it_lex = it_lex_begin; it_lex != it_lex_end; it_lex++)
+    std::vector<std::string> params;
+    for(std::vector<std::string>::iterator it_v = vect.begin(); it_v != vect.end(); it_v++)
     {
-      std::smatch match_lex = *it_lex;
-      std::string inner_lex = match_lex[1];
-      if(i == 0)
-        command = inner_lex;
+      if(it_v == vect.begin())
+        command = *it_v;
       else
-        params_vect.push_back(inner_lex);
-      i++;
+      {
+        std::string param = *it_v;
+        params.push_back(param);
+      }
     }
-    std::pair<std::string, std::vector<std::string> > tup = std::make_pair(command, params_vect);
-    cmd_queue.push_back(tup);
+    std::pair<std::string, std::vector<std::string> > pair = std::make_pair(command, params);
+    cmd_queue.push_back(pair);
   }
+
   return cmd_queue;
 }
 
