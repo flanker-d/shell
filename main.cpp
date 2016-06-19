@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
-#include <strstream>
+#include <iterator>
+#include <sstream>
 #include <algorithm>
 #include <vector>
 #include <unistd.h>
@@ -23,6 +24,8 @@ std::vector<std::pair<std::string, std::vector<std::string> > > get_command_queu
   ss << cmd;
   std::copy(std::istream_iterator<std::string>(ss), std::istream_iterator<std::string>(), std::back_inserter(tokens));
 
+  std::vector<std::pair<std::string, std::vector<std::string> > > cmd_queue;
+
   std::vector<std::vector<std::string>> cmdlist;
   std::vector<std::string>::iterator first = tokens.begin();
   std::vector<std::string>::iterator last = tokens.end();
@@ -30,28 +33,36 @@ std::vector<std::pair<std::string, std::vector<std::string> > > get_command_queu
   {
     if (*it == "|")
     {
-      cmdlist.emplace_back(first, it);
+      //cmdlist.emplace_back(first, it);
+      std::string command;
+      std::vector<std::string> params;
+      for(std::vector<std::string>::iterator it_in = first; it_in != it; it_in++)
+      {
+        if(it_in == first)
+          command = *it_in;
+        else
+        {
+          std::string param = *it_in;
+          params.push_back(param);
+        }
+      }
+      std::pair<std::string, std::vector<std::string> > pair = std::make_pair(command, params);
+      cmd_queue.push_back(pair);
       first = it + 1;
     }
   }
   if (first != last)
   {
-    cmdlist.emplace_back(first, last);
-  }
-
-  std::vector<std::pair<std::string, std::vector<std::string> > > cmd_queue;
-  for(std::vector<std::vector<std::string> >::iterator it = cmdlist.begin(); it != cmdlist.end(); it++)
-  {
-    std::vector<std::string> vect = *it;
+    //cmdlist.emplace_back(first, last);
     std::string command;
     std::vector<std::string> params;
-    for(std::vector<std::string>::iterator it_v = vect.begin(); it_v != vect.end(); it_v++)
+    for(std::vector<std::string>::iterator it_in = first; it_in != last; it_in++)
     {
-      if(it_v == vect.begin())
-        command = *it_v;
+      if(it_in == first)
+        command = *it_in;
       else
       {
-        std::string param = *it_v;
+        std::string param = *it_in;
         params.push_back(param);
       }
     }
