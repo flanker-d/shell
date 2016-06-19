@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string.h>
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
+#include <regex>
 #include <algorithm>
 #include <vector>
 #include <unistd.h>
@@ -18,24 +19,24 @@ void sig_child_handler(int sig)
 
 std::vector<std::pair<std::string, std::vector<std::string> > > get_command_queue(std::string &cmd)
 {
-  boost::regex regexp("([\\w\\s.-]+)");
-  boost::sregex_iterator it_begin = boost::sregex_iterator(cmd.begin(), cmd.end(), regexp);
-  boost::sregex_iterator it_end = boost::sregex_iterator();
+  std::regex regexp("([\\w\\s.-]+)");
+  std::sregex_iterator it_begin = std::sregex_iterator(cmd.begin(), cmd.end(), regexp);
+  std::sregex_iterator it_end = std::sregex_iterator();
 
   std::vector<std::pair<std::string, std::vector<std::string> > > cmd_queue;
-  for (boost::sregex_iterator it = it_begin; it != it_end; it++)
+  for (std::sregex_iterator it = it_begin; it != it_end; it++)
   {
-    boost::smatch match = *it;
+    std::smatch match = *it;
     std::string lexem = match[1];
-    boost::regex regexp_lex("([\\w.-]+)");
-    boost::sregex_iterator it_lex_begin = boost::sregex_iterator(lexem.begin(), lexem.end(), regexp_lex);
-    boost::sregex_iterator it_lex_end = boost::sregex_iterator();
+    std::regex regexp_lex("([\\w.-]+)");
+    std::sregex_iterator it_lex_begin = std::sregex_iterator(lexem.begin(), lexem.end(), regexp_lex);
+    std::sregex_iterator it_lex_end = std::sregex_iterator();
     int i = 0;
     std::string command;
     std::vector<std::string> params_vect;
-    for(boost::sregex_iterator it_lex = it_lex_begin; it_lex != it_lex_end; it_lex++)
+    for(std::sregex_iterator it_lex = it_lex_begin; it_lex != it_lex_end; it_lex++)
     {
-      boost::smatch match_lex = *it_lex;
+      std::smatch match_lex = *it_lex;
       std::string inner_lex = match_lex[1];
       if(i == 0)
         command = inner_lex;
