@@ -1,5 +1,7 @@
 #include <iostream>
-#include <regex>
+#include <string.h>
+//#include <regex>
+#include <algorithm>
 #include <tuple>
 #include <vector>
 #include <unistd.h>
@@ -18,23 +20,77 @@ void sig_child_handler(int sig)
   //printf("signal %d received\n", sig);
 }
 
-vect_of_tup get_command_queue(std::string &cmd)
-{
-  std::regex regexp("(\\w+)\\s?(-\\w+)?");
-  auto it_begin = std::sregex_iterator(cmd.cbegin(), cmd.cend(), regexp);
-  auto it_end = std::sregex_iterator();
+//vect_of_tup get_command_queue(std::string &cmd)
+//{
+//  std::regex regexp("(\\w+)\\s?(-\\w+)?");
+//  auto it_begin = std::sregex_iterator(cmd.cbegin(), cmd.cend(), regexp);
+//  auto it_end = std::sregex_iterator();
 
+//  vect_of_tup cmd_queue;
+//  for (auto it = it_begin; it != it_end; it++)
+//  {
+//    std::smatch match = *it;
+//    std::string command = match[1];
+//    std::string params = match[2];
+
+//    auto tup = std::make_tuple(command, params);
+//    cmd_queue.push_back(tup);
+//    //std::cout << command << " " << params << std::endl;
+//  }
+//  return cmd_queue;
+//}
+
+void remove_chars_from_string(std::string &str, char* charsToRemove ) {
+   for ( unsigned int i = 0; i < strlen(charsToRemove); ++i ) {
+      str.erase( remove(str.begin(), str.end(), charsToRemove[i]), str.end() );
+   }
+}
+
+vect_of_tup get_command_queue_without_regexp(std::string &cmd)
+{
   vect_of_tup cmd_queue;
-  for (auto it = it_begin; it != it_end; it++)
+  std::vector<std::string> cmd_vect;
+  int start_pos = 0;
+  int i = 0;
+  for(i = 0; i < cmd.size(); i++)
   {
-    std::smatch match = *it;
-    std::string command = match[1];
-    std::string params = match[2];
+    if(cmd.c_str()[i] == '|')
+    {
+      std::string comm = cmd.substr(start_pos, i - start_pos);
+      cmd_vect.push_back(comm);
+      start_pos = i + 1;
+    }
+  }
+  std::string comm = cmd.substr(start_pos, i - start_pos);
+  cmd_vect.push_back(comm);
+
+
+  for(auto it = cmd_vect.begin(); it != cmd_vect.end(); it++)
+  {
+    std::string full_command = *it;
+    std::string command;
+    std::string params;
+    start_pos = 0;
+    for(i = 0; i < full_command.size(); i++)
+    {
+      if(full_command.c_str()[i] == '-')
+      {
+        command = full_command.substr(start_pos, i - start_pos);
+        start_pos = i;
+      }
+    }
+    if(start_pos == 0)
+      command = full_command;
+    else
+      params = full_command.substr(start_pos, i - start_pos);
+
+    remove_chars_from_string(command, " ");
+    remove_chars_from_string(params, " ");
 
     auto tup = std::make_tuple(command, params);
     cmd_queue.push_back(tup);
-    //std::cout << command << " " << params << std::endl;
   }
+
   return cmd_queue;
 }
 
@@ -104,7 +160,7 @@ void run_processes(vect_of_tup::reverse_iterator &iter_begin, vect_of_tup::rever
 
 void process_command(std::string &cmd)
 {
-  vect_of_tup cmd_queue = get_command_queue(cmd);
+  vect_of_tup cmd_queue = get_command_queue_without_regexp(cmd);
 
   vect_of_tup::reverse_iterator iter_begin =  cmd_queue.rbegin();
   vect_of_tup::reverse_iterator iter_end = cmd_queue.rend();
@@ -115,7 +171,7 @@ void process_command(std::string &cmd)
 
 int main(int argc, char *argv[])
 {
-  std::string cmd;//("who | wc -l");
+  std::string cmd;//("who | sort | uniq -c | sort -nk1");
   while(true)
   {
     std::getline(std::cin, cmd);
