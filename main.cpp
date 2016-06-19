@@ -26,7 +26,6 @@ std::vector<std::pair<std::string, std::vector<std::string> > > get_command_queu
 
   std::vector<std::pair<std::string, std::vector<std::string> > > cmd_queue;
 
-  std::vector<std::vector<std::string>> cmdlist;
   std::vector<std::string>::iterator first = tokens.begin();
   std::vector<std::string>::iterator last = tokens.end();
   for (std::vector<std::string>::iterator it = first; it != last; ++it)
@@ -171,6 +170,8 @@ int main(int argc, char *argv[])
   }
   else
   {
+    int status = 0;
+    waitpid(-1, &status, 0);
     struct sigaction sigact;
     struct sigaction osigact;
     sigact.sa_handler = sig_child_handler;
